@@ -1,18 +1,24 @@
 pipeline {
-    agent any
+    agent none
     stages {
         stage('Build') {
-            steps {
-                docker.image('maven:3.9.2').inside {
-                    sh 'mvn -B -DskipTests clean package'
+            agent {
+                docker {
+                    image 'maven:3.9.2'
                 }
+            }
+            steps {
+                sh 'mvn -B -DskipTests clean package'
             }
         }
         stage('Test') {
-            steps {
-                docker.image('maven:3.9.2').inside {
-                    sh 'mvn test'
+            agent {
+                docker {
+                    image 'maven:3.9.2'
                 }
+            }
+            steps {
+                sh 'mvn test'
             }
             post {
                 always {
@@ -21,6 +27,7 @@ pipeline {
             }
         }
         stage('Deliver') {
+            agent any
             steps {
                 sh './jenkins/scripts/deliver.sh'
             }
